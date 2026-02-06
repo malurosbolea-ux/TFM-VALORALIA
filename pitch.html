@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Valoralia | Propuesta Comercial B2B</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root { --primary: #0f172a; --accent: #3b82f6; --light: #f8fafc; --text: #334155; --bg-gradient: linear-gradient(135deg, #1e293b 0%, #0f172a 100%); }
+        body { margin: 0; font-family: 'Segoe UI', system-ui, sans-serif; background: var(--light); color: var(--text); }
+        .container { max-width: 1100px; margin: 0 auto; padding: 20px; }
+        a { text-decoration: none; color: inherit; transition: all 0.3s; }
+        
+        /* HERO SECTION */
+        header { background: var(--bg-gradient); color: white; padding: 100px 20px 120px; text-align: center; border-radius: 0 0 50px 50px; box-shadow: 0 20px 40px rgba(15, 23, 42, 0.2); position: relative; }
+        h1 { font-size: 3.5rem; margin-bottom: 20px; letter-spacing: -2px; }
+        .subtitle { font-size: 1.5rem; color: #cbd5e1; max-width: 700px; margin: 0 auto 40px; font-weight: 300; }
+        .badge { background: rgba(59, 130, 246, 0.2); color: #60a5fa; padding: 8px 16px; border-radius: 20px; font-weight: 600; font-size: 0.9rem; text-transform: uppercase; letter-spacing: 1px; border: 1px solid rgba(59, 130, 246, 0.3); }
+        
+        /* FEATURES */
+        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 30px; margin-top: -60px; position: relative; z-index: 10; }
+        .card { background: white; padding: 40px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.05); transition: transform 0.3s; border-top: 5px solid var(--accent); }
+        .card:hover { transform: translateY(-10px); }
+        .card h3 { font-size: 1.4rem; margin-bottom: 15px; color: var(--primary); }
+        .card p { color: #64748b; line-height: 1.6; }
+        .icon { font-size: 2.5rem; color: var(--accent); margin-bottom: 20px; }
+
+        /* CTA BUTTON */
+        .btn { display: inline-block; background: var(--accent); color: white !important; padding: 18px 40px; border-radius: 50px; font-weight: bold; font-size: 1.1rem; box-shadow: 0 10px 25px rgba(59, 130, 246, 0.4); }
+        .btn:hover { background: #2563eb; transform: scale(1.05); box-shadow: 0 15px 35px rgba(59, 130, 246, 0.5); }
+
+        /* CONTACT */
+        .cta-section { text-align: center; padding: 80px 20px; background: #0f172a; color: white; margin-top: 80px; border-radius: 30px 30px 0 0; }
+        .contact-info { display: flex; justify-content: center; gap: 20px; margin-top: 40px; flex-wrap: wrap; }
+        .contact-item { background: rgba(255,255,255,0.1); padding: 15px 25px; border-radius: 10px; display: flex; align-items: center; gap: 10px; }
+        .contact-item:hover { background: rgba(255,255,255,0.2); transform: translateY(-3px); }
+    </style>
+</head>
+<body>
+
+    <header>
+        <span class="badge">Tecnología Deep Learning 2026</span>
+        <h1>VALORALIA <span style="color:var(--accent)">ENTERPRISE</span></h1>
+        <p class="subtitle">La primera plataforma de Inteligencia Artificial Inmobiliaria capaz de simular escenarios de crisis, burbujas y recesión en tiempo real.</p>
+        
+        <a href="http://13.62.247.160" target="_blank" class="btn">
+            SOLICITAR ACCESO A LA DEMO <i class="fas fa-arrow-right" style="margin-left:10px;"></i>
+        </a>
+    </header>
+
+    <div class="container">
+        <div class="grid">
+            <div class="card">
+                <div class="icon"><i class="fas fa-brain"></i></div>
+                <h3>Precisión Validada</h3>
+                <p>Nuestro modelo Random Forest ha sido calibrado con más de 20.000 testigos reales de Madrid, logrando un error medio inferior al 4% en zonas Prime.</p>
+            </div>
+            <div class="card">
+                <div class="icon"><i class="fas fa-shield-alt"></i></div>
+                <h3>Lógica Anti-Alucinación</h3>
+                <p>A diferencia de otras IAs, Valoralia incorpora reglas de negocio estrictas ("Anti-Idiotas") que impiden tasaciones incoherentes, garantizando fiabilidad profesional.</p>
+            </div>
+            <div class="card">
+                <div class="icon"><i class="fas fa-chart-line"></i></div>
+                <h3>Stress Testing</h3>
+                <p>Única herramienta del mercado capaz de proyectar el valor de su cartera ante escenarios de Crash (-20%) o Burbuja (+15%) con un solo clic.</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="cta-section">
+        <h2>¿Hablamos de Negocio?</h2>
+        <p style="font-size: 1.4rem; margin-bottom: 10px; color: #cbd5e1;">María Luisa Ros Bolea</p>
+        <p style="color: #94a3b8; margin-bottom: 30px;">Data Scientist & Digital Strategy | Madrid/Murcia</p>
+        
+        <div class="contact-info">
+            <a href="tel:+34692892183" class="contact-item">
+                <i class="fas fa-phone-alt"></i> +34 692 892 183
+            </a>
+            <a href="mailto:malurosbolea@gmail.com" class="contact-item">
+                <i class="fas fa-envelope"></i> Email
+            </a>
+            <a href="https://www.linkedin.com/in/mar%C3%ADa-luisa-ros-bolea-400780160/" target="_blank" class="contact-item">
+                <i class="fab fa-linkedin-in"></i> LinkedIn
+            </a>
+            <a href="https://malurosbolea-ux.github.io/digital-strategy-portfolio/" target="_blank" class="contact-item">
+                <i class="fas fa-globe"></i> Portfolio
+            </a>
+        </div>
+    </div>
+
+</body>
+</html>

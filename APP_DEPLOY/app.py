@@ -1,217 +1,99 @@
 import streamlit as st
-import time
+import pickle
+import numpy as np
+import os
 
-# -----------------------------------------------------------------------------
-# 1. CONFIGURACIÓN E INICIALIZACIÓN
-# -----------------------------------------------------------------------------
-st.set_page_config(page_title="Valoralia TFM", page_icon="🏙️", layout="centered")
+# CONFIGURACIÓN DE PÁGINA
+st.set_page_config(page_title="Valoralia Systems", layout="wide")
 
-# -----------------------------------------------------------------------------
-# 2. DISEÑO VISUAL (INTOCABLE - EL QUE TE GUSTA)
-# -----------------------------------------------------------------------------
+# ESTILOS CSS PROFESIONALES
 st.markdown("""
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 <style>
-    @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@700;900&family=Inter:wght@400;600&display=swap');
-
-    /* FONDO DE MADRID */
-    .stApp {
-        background: linear-gradient(rgba(0,43,91,0.85), rgba(0,43,91,0.92)),
-                    url("https://images.unsplash.com/photo-1543783207-ec64e4d95325?q=80&w=2070");
-        background-size: cover;
-        background-attachment: fixed;
-    }
-    
-    .block-container {
-        background-color: #FFFFFF !important;
-        padding: 2.5rem !important;
-        border-radius: 12px;
-        box-shadow: 0 20px 60px rgba(0,0,0,0.6);
-        max-width: 900px;
-    }
-    
-    h1 { color: #002B5B !important; text-align: center; font-family: 'Montserrat'; text-transform: uppercase; font-size: 2.5rem; letter-spacing: 2px;}
-    .subtitle { text-align:center; color:#555; font-family:'Inter'; margin-bottom: 30px; font-weight:600; text-transform:uppercase; font-size: 1rem; }
-
-    .section-header {
-        color: #002B5B;
-        font-family: 'Montserrat';
-        font-weight: 800;
-        text-transform: uppercase;
-        border-bottom: 3px solid #002B5B;
-        margin-bottom: 20px;
-        padding-top: 10px;
-        font-size: 1.1rem;
-    }
-    
-    p, label, div.stRadio > label { 
-        color: #333 !important; font-family: 'Inter'; font-weight: 700; font-size: 14px; 
-    }
-    
-    /* BOTÓN PRO */
-    div.stButton > button:first-child {
-        background-color: #002B5B !important;
-        color: #FFFFFF !important;
-        border: none !important;
-        padding: 18px !important;
-        font-size: 20px !important;
-        font-weight: 900 !important;
-        text-transform: uppercase;
-        width: 100%;
-        margin-top: 25px;
-        border-radius: 8px;
-        box-shadow: 0 6px 15px rgba(0,0,0,0.2);
-        transition: transform 0.2s;
-    }
-    div.stButton > button:first-child:hover {
-        background-color: #004080 !important;
-        transform: scale(1.02);
-    }
-    div.stButton > button:first-child p { color: #FFFFFF !important; }
-
-    /* RESULTADO */
-    .result-box {
-        background: linear-gradient(135deg, #002B5B 0%, #001F3F 100%);
-        padding: 35px;
-        border-radius: 10px;
-        text-align: center;
-        margin-top: 35px;
-        box-shadow: 0 10px 30px rgba(0,0,0,0.3);
-        border: 1px solid rgba(255,255,255,0.1);
-    }
-    .white-title { color: #E0E0E0 !important; font-family: 'Inter'; font-size: 14px; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 10px; }
-    .white-price { color: #FFFFFF !important; font-family: 'Montserrat'; font-weight: 900; font-size: 52px; text-shadow: 0 2px 10px rgba(0,0,0,0.3); }
-    .white-m2 { color: #40E0D0 !important; font-family: 'Montserrat'; font-size: 18px; font-weight: 700; margin-top: 5px; margin-bottom: 15px; }
-    .white-footer { color: #BBBBBB !important; font-family: 'Inter'; font-size: 12px; margin-top: 15px; }
-    
-    /* ALERTA PERSONALIZADA */
-    .alerta-logica {
-        background-color: #fff3cd;
-        color: #856404;
-        padding: 10px;
-        border-radius: 5px;
-        border: 1px solid #ffeeba;
-        margin-top: 15px;
-        font-size: 13px;
-        font-family: 'Inter';
-        text-align: center;
-    }
-
-    header, footer {visibility: hidden;}
+    @import url('https://fonts.googleapis.com/css2?family=Oswald:wght@500;700&display=swap');
+    .stApp { background: linear-gradient(rgba(255,255,255,0.92), rgba(255,255,255,0.95)), url('https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?q=80&w=2670'); background-size: cover; background-attachment: fixed; }
+    h1, h2, h3 { font-family: 'Oswald'; color: #0F172A !important; text-transform: uppercase; }
+    .stSelectbox label p, .stNumberInput label p, .stSlider label p, .stCheckbox label p { color: #B91C1C !important; font-weight: 800; font-size: 14px; }
+    section[data-testid='stSidebar'] { background-color: #0F172A; }
+    section[data-testid='stSidebar'] * { color: white !important; }
+    .stButton>button { background: #2563EB; color: white !important; font-weight: bold; width: 100%; padding: 15px; border: none; font-size: 18px; }
+    .resultado-final { background-color: white; color: black; padding: 30px; border: 2px solid #0F172A; border-radius: 10px; box-shadow: 0 10px 30px rgba(0,0,0,0.15); margin-top: 20px; }
 </style>
 """, unsafe_allow_html=True)
 
-# -----------------------------------------------------------------------------
-# 3. INTERFAZ
-# -----------------------------------------------------------------------------
-st.title("VALORALIA SYSTEMS")
-st.markdown("<p class='subtitle'>PLATAFORMA DE VALORACIÓN INTELIGENTE (TFM)</p>", unsafe_allow_html=True)
+# CARGA DE MODELOS (Con gestión de errores)
+try:
+    model = pickle.load(open('modelo_valoralia_final.pkl', 'rb'))
+    dist_map = pickle.load(open('mapa_distritos.pkl', 'rb'))
+except:
+    st.error("Error crítico: No se encuentran los modelos 'modelo_valoralia_final.pkl' o 'mapa_distritos.pkl'. Ejecuta generar_modelo.py primero.")
+    st.stop()
 
-col1, col2 = st.columns(2, gap="large")
+# SIDEBAR: PARAMETRIZACIÓN MACRO
+st.sidebar.title("PARAMETRIZACIÓN")
+esc = st.sidebar.radio("ESCENARIO MACRO:", ["ESTABILIDAD (Base)", "RECESIÓN (-10%)", "CRASH (-20%)", "BURBUJA (+15%)"])
 
-with col1:
-    st.markdown('<div class="section-header"><i class="fas fa-home"></i> EL INMUEBLE</div>', unsafe_allow_html=True)
-    
-    metros = st.slider("Superficie Construida (m²)", 30, 500, 42) # Valor defecto de tu captura
-    habitaciones = st.slider("Habitaciones", 1, 6, 2)
-    banos = st.slider("Baños", 1, 5, 1)
+# TÍTULO PRINCIPAL
+st.markdown("<h1 style='font-size:55px; margin-bottom:0;'>VALORALIA <span style='color:#2563EB'>SYSTEMS</span></h1>", unsafe_allow_html=True)
+st.markdown("<p style='color:#64748B; font-weight:bold; letter-spacing:2px; margin-top:-15px;'>REAL ESTATE INTELLIGENCE UNIT</p><hr>", unsafe_allow_html=True)
 
-with col2:
-    st.markdown('<div class="section-header"><i class="fas fa-map-marked-alt"></i> UBICACIÓN Y ESTADO</div>', unsafe_allow_html=True)
-    
-    distritos_list = [
-        "Salamanca", "Chamberí", "Retiro", "Centro", "Chamartín",
-        "Moncloa", "Tetuán", "Arganzuela", "Fuencarral", "Hortaleza",
-        "Latina", "Carabanchel", "Usera", "Villaverde",
-        "Puente de Vallecas", "Villa de Vallecas"
-    ]
-    distrito = st.selectbox("Seleccione Distrito", distritos_list)
-    
-    st.write("")
-    estado = st.selectbox("Estado de conservación", ["Obra Nueva", "Buen estado", "A reformar"])
-    ascensor = st.radio("¿Tiene Ascensor?", ["SÍ", "NO"], horizontal=True, index=0)
+# COLUMNAS DE ENTRADA
+c1, c2 = st.columns(2, gap="large")
 
-# -----------------------------------------------------------------------------
-# 4. MOTOR LÓGICO INTELIGENTE (CON REGLAS DE COHERENCIA)
-# -----------------------------------------------------------------------------
-if st.button("CALCULAR TASACIÓN DE MERCADO"):
+with c1:
+    dist = st.selectbox("DISTRITO", sorted(dist_map.keys()))
+    m2 = st.number_input("METROS CUADRADOS", 30, 600, 90)
     
-    bar = st.progress(0, text="Valoralia AI: Validando coherencia de datos...")
-    time.sleep(0.15)
-    bar.progress(50, text="Aplicando precios de mercado reales...")
-    time.sleep(0.15)
-    bar.empty()
-
-    # --- A. LÓGICA DE NEGOCIO (EL FILTRO ANTI-LOCURAS) ---
-    # Esto es lo que da la Matrícula: Impedir inputs absurdos.
-    
-    banos_reales = banos
-    habs_reales = habitaciones
-    aviso_logico = ""
-    
-    # REGLA 1: Pisos pequeños no pueden tener 3 baños
-    if metros < 55 and banos > 1:
-        banos_reales = 1
-        aviso_logico = "⚠️ Ajuste Automático: Por superficie (<55m²), se ha calculado con 1 baño para mayor realismo."
-    elif metros < 90 and banos > 2:
-        banos_reales = 2
-        aviso_logico = "⚠️ Ajuste Automático: Por superficie (<90m²), se ha limitado a 2 baños."
+    # LÓGICA DE NEGOCIO (ANTI-ALUCINACIÓN)
+    max_h = 1 if m2 < 45 else (2 if m2 < 70 else (3 if m2 < 100 else 5))
+    if max_h > 1:
+        hab = st.slider(f"HABITACIONES (Máx por m²: {max_h})", 1, max_h, min(3, max_h))
+    else:
+        st.info(f"HABITACIONES: 1 (Limitado por {m2}m²)")
+        hab = 1
         
-    # REGLA 2: No puedes meter 5 habitaciones en 60 metros
-    if metros < 60 and habitaciones > 2:
-        habs_reales = 2
-    
-    # --- B. PRECIOS BASE (TUS DATOS REALES) ---
-    # Precios calibrados con tus capturas recientes (Salamanca ~9.4k, Latina ~2.7k)
-    precios_base = {
-        "Salamanca": 7800, 
-        "Chamberí": 6500, 
-        "Retiro": 6200, 
-        "Centro": 5900,
-        "Chamartín": 6000, 
-        "Moncloa": 5200, 
-        "Tetuán": 4300, 
-        "Arganzuela": 4600,
-        "Fuencarral": 3900, 
-        "Hortaleza": 3600, 
-        "Latina": 2700, 
-        "Carabanchel": 2600,
-        "Usera": 2400, 
-        "Villaverde": 2200, 
-        "Puente de Vallecas": 2500, 
-        "Villa de Vallecas": 2900
-    }
-    
-    # --- C. CÁLCULO ---
-    precio_m2 = precios_base.get(distrito, 3000)
-    valor = precio_m2 * metros
-    
-    # Multiplicadores
-    if ascensor == "SÍ": 
-        if precio_m2 > 5000: valor *= 1.05 # Zona rica: ascensor suma poco
-        else: valor *= 1.12 # Zona humilde: ascensor suma mucho
-        
-    if estado == "A reformar": valor *= 0.75
-    elif estado == "Obra Nueva": valor *= 1.15 # Bonus controlado
-        
-    # Bonus por extras (Solo si tiene sentido por metros)
-    if habs_reales > 3 and metros > 100: valor *= 1.05
-    if banos_reales >= 3 and metros > 120: valor *= 1.05
-        
-    precio_final = valor
-    precio_unitario = precio_final / metros
+    max_b = hab if m2 < 130 else hab + 1
+    if max_b > 1:
+        ban = st.slider(f"BAÑOS (Máx lógico: {max_b})", 1, max_b, 1)
+    else:
+        st.info("BAÑOS: 1 (Limitado por lógica)")
+        ban = 1
 
-    # VISUALIZACIÓN
-    st.markdown(f"""
-    <div class="result-box">
-        <p class="white-title">VALOR ESTIMADO (EURO VALUATION)</p>
-        <div class="white-price">{precio_final:,.0f} €</div>
-        <div class="white-m2">({precio_unitario:,.0f} €/m²)</div>
-        <p class="white-footer"><i class="fas fa-check-circle"></i> Confianza: Alta (94%) | Tendencia: Alcista</p>
-        <p style="color:#aaa; font-size:10px; margin-top:5px;">Nota Legal: Este informe es una estimación automatizada basada en Inteligencia Artificial. Valoralia Algorithms Inc.</p>
+with c2:
+    est_v = st.selectbox("ESTADO", ["Buen estado", "A reformar", "Obra Nueva"])
+    st.markdown("<br>", unsafe_allow_html=True)
+    k1, k2, k3 = st.columns(3)
+    asc = k1.checkbox("ASCENSOR", True)
+    ext = k2.checkbox("EXTERIOR", True)
+    ter = k3.checkbox("TERRAZA", False)
+
+# BOTÓN DE CÁLCULO
+if st.button("CALCULAR TASACIÓN IA"):
+    # Encoding variables categóricas
+    e0 = 1 if est_v=="Buen estado" else 0
+    e1 = 1 if est_v=="A reformar" else 0
+    e2 = 1 if est_v=="Obra Nueva" else 0
+    
+    # Vector de características
+    features = [[m2, hab, ban, 1 if asc else 0, 1 if ext else 0, 1 if ter else 0, e0, e1, e2, dist_map[dist]]]
+    
+    # Predicción base
+    res = model.predict(features)[0]
+    
+    # Ajuste por Escenario Macro
+    factor = 1.0
+    if "RECESIÓN" in esc: factor = 0.90
+    if "CRASH" in esc: factor = 0.80
+    if "BURBUJA" in esc: factor = 1.15
+    final = res * factor
+    
+    # VISUALIZACIÓN DE RESULTADOS
+    st.markdown(f'''<div class="resultado-final">
+    <div style="display:flex; justify-content:space-between; align-items:center;">
+        <div><p style="color:#B91C1C; font-weight:900; margin:0;">VALORACIÓN IA</p><h1 style="font-size:60px; margin:0;">{final:,.0f} €</h1></div>
+        <div style="text-align:right;"><p style="color:#B91C1C; font-weight:900; margin:0;">PRECIO m²</p><h3 style="font-size:28px;">{final/m2:,.0f} €/m²</h3></div>
     </div>
-    """, unsafe_allow_html=True)
-    
-    # MOSTRAR AVISO SI SE ACTIVÓ EL FILTRO (ESTO QUEDA MUY PRO)
-    if aviso_logico:
-        st.markdown(f'<div class="alerta-logica"><i class="fas fa-info-circle"></i> {aviso_logico}</div>', unsafe_allow_html=True)
+    <div style="margin-top:15px; border-top:1px solid #EEE; padding-top:10px; display:flex; justify-content:space-between;">
+        <span style="font-weight:bold; color:#555;">MADRID 2026 | MODELO TFM</span>
+        <span style="font-weight:bold; color:#000;">ESCENARIO: {esc.split('(')[0]}</span>
+    </div></div>''', unsafe_allow_html=True)
+
